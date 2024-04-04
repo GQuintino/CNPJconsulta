@@ -1,0 +1,68 @@
+Aqui está um resumo do passo a passo para executar e testar o aplicativo:
+
+1. **Instalação de Dependências:**
+   Certifique-se de ter o Python e o Flask instalados. Você também precisará instalar o Flask SQLAlchemy e o requests se ainda não o fez. Você pode instalar essas dependências com os seguintes comandos:
+
+   ```bash
+   pip install Flask Flask-SQLAlchemy requests
+   ```
+
+2. **Configuração do Banco de Dados:**
+   Se você estiver usando o SQLite (como no exemplo), o banco de dados será criado automaticamente quando você iniciar o aplicativo. Se estiver usando outro banco de dados, certifique-se de configurar corretamente o URI do banco de dados no código.
+
+3. **Execução do Aplicativo:**
+   Execute o aplicativo Flask a partir do terminal. Certifique-se de estar no diretório do seu aplicativo. Use o seguinte comando:
+
+   ```bash
+   python app.py
+   ```
+
+4. **Acesso à Página Web:**
+   Abra um navegador da web e acesse `http://localhost:5000/`. Você verá a página de consulta de CNPJ.
+
+5. **Consulta de CNPJ:**
+   No campo de texto, insira um CNPJ e clique no botão "Consultar". O aplicativo verificará se o CNPJ já está no banco de dados. Se não estiver, fará uma consulta externa para obter os dados e os inserirá no banco de dados.
+
+6. **Verificação dos Resultados:**
+   Você pode verificar se os dados foram inseridos corretamente no banco de dados. Se você estiver usando SQLite, pode usar uma ferramenta como o DB Browser for SQLite para visualizar o banco de dados.
+
+Certifique-se de ajustar o código conforme necessário para atender às suas necessidades específicas e de segurança.
+
+
+-----------------------------------------------
+
+
+
+Instale o driver PostgreSQL:
+
+Antes de tudo, é necessário instalar o driver psycopg2 para PostgreSQL. Você pode fazer isso com o seguinte comando:
+
+bash
+Copy code
+pip install psycopg2
+Configure a conexão com o PostgreSQL:
+
+No seu arquivo app.py, altere a URL de conexão com o banco de dados para o PostgreSQL. Por exemplo:
+
+python
+Copy code
+# Substitua as informações com as do seu banco PostgreSQL
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://seu_usuario: sua_senha@localhost/seu_banco_de_dados'
+Certifique-se de substituir seu_usuario, sua_senha e seu_banco_de_dados com as informações corretas do seu banco de dados PostgreSQL.
+
+Crie as tabelas no PostgreSQL:
+
+Antes de iniciar o aplicativo Flask, você pode precisar criar as tabelas no banco de dados PostgreSQL. Você pode fazer isso executando o seguinte comando no terminal, após acessar o shell do PostgreSQL:
+
+bash
+Copy code
+CREATE TABLE empresas (
+    id SERIAL PRIMARY KEY,
+    cnpj VARCHAR(14) NOT NULL UNIQUE,
+    nome_fantasia VARCHAR(255),
+    razao_social VARCHAR(255),
+    endereco VARCHAR(255)
+);
+Este comando cria uma tabela chamada empresas com as colunas necessárias para armazenar os dados das empresas.
+
+Com esses ajustes, seu aplicativo Flask deve estar configurado para usar o PostgreSQL como banco de dados. Certifique-se de ter o PostgreSQL instalado e em execução localmente antes de tentar conectar seu aplicativo a ele.

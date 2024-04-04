@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de CNPJ</title>
+    <style>
+        body {
+            background-color: #2e0a52;
+            color: #00ff00;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #cnpjInput {
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+
+        #consultarResult {
+            margin-bottom: 16px;
+        }
+
+        #exportarBtn {
+            padding: 8px 16px;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #exportarBtn:hover {
+            background-color: #005f80;
+        }
+
+        #dadosEmpresa {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Consulta de CNPJ</h1>
+    <form id="cnpjForm">
+        <input type="text" id="cnpjInput" placeholder="Digite o CNPJ (apenas números)">
+        <button type="button" onclick="consultarCNPJ()">Consultar</button>
+    </form>
+    <div id="consultarResult"></div>
+    <button type="button" id="exportarBtn" onclick="exportarCSV()">Exportar para CSV</button>
+
+    <div id="dadosEmpresa">
+        <h2>Nome Fantasia:</h2>
+        <p id="nomeFantasia"></p>
+        <h2>Razão Social:</h2>
+        <p id="razaoSocial"></p>
+        <h2>Endereço:</h2>
+        <p id="endereco"></p>
+    </div>
+
+    <script>
+        function formatarCNPJ(cnpj) {
+            var cnpjLimpo = cnpj.replace(/\D/g, '');
+            return cnpjLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+        }
+
+        function exportarCSV() {
+            var cnpjInput = document.getElementById('cnpjInput');
+            var cnpjFormatado = formatarCNPJ(cnpjInput.value);
+            cnpjInput.value = cnpjFormatado;
+
+            fetch('/exportar_csv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'cnpj=' + encodeURIComponent(cnpjFormatado),
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'empresa.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error('Erro na exportação:', error);
+                });
+        }
+
+        function consultarCNPJ() {
+            var cnpjInput = document.getElementById('cnpjInput');
+            var cnpjFormatado = formatarCNPJ(cnpjInput.value);
+            cnpjInput.value = cnpjFormatado;
+
+            fetch('/consultar_cnpj', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'cnpj=' + encodeURIComponent(cnpjFormatado),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('consultarResult').innerText = 'Empresa não encontrada.';
+                        document.getElementById('dadosEmpresa').style.display = 'none';
+                    } else {
+                        document.getElementById('consultarResult').innerText = '';
+                        document.getElementById('nomeFantasia').innerText = data.nome_fantasia;
+                        document.getElementById('razaoSocial').innerText = data.razao_social;
+                        document.getElementById('endereco').innerText = data.endereco;
+                        document.getElementById('dadosEmpresa').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro na consulta:', error);
+                });
+        }
+    </script>
+
+</body>
+
+</html>

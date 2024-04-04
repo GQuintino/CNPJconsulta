@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de CNPJ</title>
+</head>
+<body>
+    <h1>Consulta de CNPJ</h1>
+    <form id="cnpjForm">
+        <label for="cnpjInput">Digite seu CNPJ:</label>
+        <input type="text" id="cnpjInput" name="cnpj" required>
+        <button type="button" onclick="consultarCNPJ()">Consultar</button>
+    </form>
+    <div id="resultado"></div>
+
+    <script>
+        function consultarCNPJ() {
+            var cnpj = document.getElementById('cnpjInput').value;
+
+            fetch('/consultar_cnpj', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'cnpj=' + encodeURIComponent(cnpj),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('resultado').innerHTML = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Erro na consulta:', error);
+            });
+        }
+    </script>
+</body>
+</html>
